@@ -186,26 +186,127 @@ bool IntBST::contains(int value) const {
 
 // returns the Node containing the predecessor of the given value
 IntBST::Node* IntBST::getPredecessorNode(int value) const{
-	return NULL;
+	Node* n;
+	if(contains(value)) {
+		n = getNodeFor(value, root);
+	} else {
+		return NULL;
+	}
+
+	if(n->left != NULL) { //has left child
+		n = n->left;
+		while(n->right != NULL) {
+			n = n->right;
+		}
+		return n;
+	} else { //no left child
+		while(n->parent != NULL) {
+			n = n->parent;
+			if(n->info < value) {
+				return n;
+			}
+		}
+		return NULL;
+	}
 }
 
 // returns the predecessor value of the given value or 0 if there is none
 int IntBST::getPredecessor(int value) const{
-    return 0; // REPLACE THIS NON-SOLUTION
+	Node* n = getPredecessorNode(value);
+	if(n == NULL) {
+		return 0;
+	} else {
+		return n->info;
+	}
 }
 
 // returns the Node containing the successor of the given value
 IntBST::Node* IntBST::getSuccessorNode(int value) const{
-    return NULL; // REPLACE THIS NON-SOLUTION
+        Node* n;
+        if(contains(value)) {
+                n = getNodeFor(value, root);
+        } else {
+                return NULL;
+        }
+
+        if(n->right != NULL) { //has right child
+                n = n->right;
+                while(n->left != NULL) {
+                        n = n->left;
+                }
+                return n;
+        } else { //no right child
+                while(n->parent != NULL) {
+                        n = n->parent;
+                        if(n->info > value) {
+                                return n;
+                        }
+                }
+                return NULL;
+        }
 }
 
 // returns the successor value of the given value or 0 if there is none
 int IntBST::getSuccessor(int value) const{
-    return 0; // REPLACE THIS NON-SOLUTION
+	Node* n = getSuccessorNode(value);
+	if(n == NULL) {
+		return 0;
+	} else {
+		return n->info;
+	}
 }
 
 // deletes the Node containing the given value from the tree
 // returns true if the node exist and was deleted or false if the node does not exist
 bool IntBST::remove(int value){
-    return false; // REPLACE THIS NON-SOLUTION
+    if(!(contains(value))) {
+    	return false;
+    }
+    Node* n = getNodeFor(value, root);
+    if(n->left == NULL && n->right == NULL) { //case 1: leaf node
+    	if(n->parent == NULL) {
+		root = NULL;
+		delete n;
+	}
+    	Node* nPar = n->parent;
+	if(nPar->left == n) {
+		delete n;
+		nPar->left = NULL;
+	} else {
+		delete n;
+		nPar->right = NULL;
+	}
+    } else if(n->left == NULL || n->right == NULL) { //case 2: internal with one child
+    	if(n->parent == NULL) {
+		if(n->left != NULL) {
+			root = n->left;
+			root->parent = NULL;
+		} else {
+			root = n->right;
+			root->parent = NULL;
+		}
+		delete n;
+	}
+	Node* nPar = n->parent;
+	Node* nChi;
+	if(n->left != NULL) {
+		nChi = n->left;
+	} else {
+		nChi = n->right;
+	}
+	if(nPar->left == n) {
+		nPar->left = nChi;
+		delete n;
+	} else {
+		nPar->right = nChi;
+		delete n;
+	}
+
+    } else { //case 3: internal with 2 children
+    	Node* nSuc = getSuccessorNode(n->info);
+	int sucInf = nSuc->info;
+	remove(nSuc->info);
+	n->info = sucInf;
+    }
+    return true;
 }
