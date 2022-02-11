@@ -267,6 +267,7 @@ bool IntBST::remove(int value){
     	if(n->parent == NULL) {
 		root = NULL;
 		delete n;
+		break;
 	}
     	Node* nPar = n->parent;
 	if(nPar->left == n) {
